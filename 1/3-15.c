@@ -60,10 +60,12 @@ int main(int argc, char** argv) {
     }
 
     clock_t start_serial = clock();
-    MPI_Scatter(houses, (int)(local_size * sizeof(Point)), MPI_BYTE, local_houses, (int)(local_size * sizeof(Point)), MPI_BYTE,
+    MPI_Scatter(houses, (int)(local_size * sizeof(Point)), MPI_BYTE, local_houses,
+                (int)(local_size * sizeof(Point)), MPI_BYTE,
                 0, MPI_COMM_WORLD);
     clock_t end_serial = clock();
-    printf("process %d, scatter time: %f seconds\n", id, (double)(end_serial - start_serial) / CLOCKS_PER_SEC);
+    printf("process %d, scatter time: %f seconds\n", id,
+           (double)(end_serial - start_serial) / CLOCKS_PER_SEC);
 
     Distance local = {DBL_MAX, -1};
 
@@ -76,19 +78,23 @@ int main(int argc, char** argv) {
         }
     }
     end_serial = clock();
-    printf("process %d, serial time: %f seconds\n", id, (double)(end_serial - start_serial) / CLOCKS_PER_SEC);
+    printf("process %d, serial time: %f seconds\n", id,
+           (double)(end_serial - start_serial) / CLOCKS_PER_SEC);
 
     start_serial = clock();
     Distance global;
     MPI_Reduce(&local, &global, 1, MPI_DOUBLE_INT, MPI_MINLOC, 0, MPI_COMM_WORLD);
     end_serial = clock();
-    printf("process %d, reduce time: %f seconds\n", id, (double)(end_serial - start_serial) / CLOCKS_PER_SEC);
+    printf("process %d, reduce time: %f seconds\n", id,
+           (double)(end_serial - start_serial) / CLOCKS_PER_SEC);
 
     MPI_Barrier(MPI_COMM_WORLD);
     if (id == 0) {
         end_time = MPI_Wtime();
-        printf("the closest house is at index %d with x: %f, y: %f, distance %lf, execution time: %f seconds\n", global.index,
-               houses[global.index].x, houses[global.index].y, global.distance, end_time-start_time);
+        printf("the closest house is at index %d with x: %f, y: %f, "
+               "distance %lf, execution time: %f seconds\n", global.index,
+               houses[global.index].x, houses[global.index].y,
+               global.distance, end_time-start_time);
     }
 
     free(local_houses);

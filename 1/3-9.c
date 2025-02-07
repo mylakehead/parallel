@@ -42,13 +42,11 @@ void parallel_quick_sort(int *arr, int n, int id, int p, MPI_Comm comm) {
 
     int pivot;
     if (id == 0) {
-        pivot = arr[0];  // 选择第一个元素作为 pivot
+        pivot = arr[0];
     }
 
-    // 广播 pivot 给所有进程
     MPI_Bcast(&pivot, 1, MPI_INT, 0, comm);
 
-    // 分区
     int left_count = 0, right_count = 0;
     int *left = (int *)malloc(n * sizeof(int));
     int *right = (int *)malloc(n * sizeof(int));
@@ -58,7 +56,6 @@ void parallel_quick_sort(int *arr, int n, int id, int p, MPI_Comm comm) {
         else right[right_count++] = arr[i];
     }
 
-    // 计算新的进程数
     int new_size = p / 2;
     MPI_Comm new_comm;
     int color = (id < new_size) ? 0 : 1;
@@ -71,7 +68,6 @@ void parallel_quick_sort(int *arr, int n, int id, int p, MPI_Comm comm) {
         parallel_quick_sort(right, right_count, id - new_size, p - new_size, new_comm);
     }
 
-    // 进程合并数据
     int *sorted_data = (int *)malloc(n * sizeof(int));
     MPI_Gather(left, left_count, MPI_INT, sorted_data, left_count, MPI_INT, 0, comm);
     MPI_Gather(right, right_count, MPI_INT, sorted_data + left_count, right_count, MPI_INT, 0, comm);
