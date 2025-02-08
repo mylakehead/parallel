@@ -1,4 +1,4 @@
-EXE = 2_comm 2_overlapping
+EXE = 2_comm 2_overlapping 3-15 3-5
 
 default: mpicc
 
@@ -7,6 +7,7 @@ mpicc:
 
 run:
 	mpiexec -n 6 ./2_comm
+	mpiexec -n 6 ./sieve_broadcast 100000000
 
 clean:
 	rm -rf *.dSYM

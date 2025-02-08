@@ -4,7 +4,7 @@
 #include <time.h>
 #include <mpi.h>
 
-#define LIMIT 100000000
+#define LIMIT 1000000
 
 
 bool is_prime(int n) {
