@@ -5,11 +5,12 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <limits.h>
 
 #define BLOCK_LOW(id, p, n)  ( ((id) * (n)) / (p) )
 #define BLOCK_HIGH(id, p, n) ( BLOCK_LOW((id)+1, p, n) - 1 )
 #define BLOCK_SIZE(id, p, n) ( BLOCK_HIGH(id, p, n) - BLOCK_LOW(id, p, n) + 1 )
-#define BLOCK_OWNER(index,p,n) (((p)*(index)+1)-1)/(n))
 
 
 int main(int argc, char **argv) {
@@ -23,14 +24,21 @@ int main(int argc, char **argv) {
 
     int n = 100000;
     if (argc >= 2) {
-        n = atoi(argv[1]);
+        char *input;
+        errno = 0;
+        long val = strtol(argv[1], &input, 10);
+        if (errno == ERANGE || val > INT_MAX || val < INT_MIN) {
+            printf("Error: Number out of int range\n");
+            MPI_Finalize();
+            return 1;
+        }
+        n = (int)val;
     }
     if(!id) {
         printf("calculating number of primes from %d to %d ...\n", 0, n);
     }
 
     int low_value = 2 + BLOCK_LOW(id, p, n - 1);
-    int high_value = 2 + BLOCK_HIGH(id, p, n - 1);
     int size = BLOCK_SIZE(id, p, n - 1);
 
     int proc0_size = (n - 1) / p;
@@ -42,7 +50,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    char  *marked;
+    char *marked;
     marked = (char *)malloc(size);
     if (marked == NULL) {
         printf("process %d can not allocate memory\n", id);
@@ -102,5 +110,8 @@ int main(int argc, char **argv) {
     }
 
     MPI_Finalize();
+
+    free(marked);
+
     return 0;
 }

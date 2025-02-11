@@ -3,14 +3,11 @@
 //
 #include <mpi.h>
 #include <math.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
-#define BLOCK_LOW(id, p, n)  ( ((id) * (n)) / (p) )
-#define BLOCK_HIGH(id, p, n) ( BLOCK_LOW((id)+1, p, n) - 1 )
-#define BLOCK_SIZE(id, p, n) ( BLOCK_HIGH(id, p, n) - BLOCK_LOW(id, p, n) + 1 )
-#define BLOCK_OWNER(index,p,n) (((p)*(index)+1)-1)/(n))
+#include <limits.h>
 
 
 int main(int argc, char **argv) {
@@ -24,7 +21,15 @@ int main(int argc, char **argv) {
 
     int n = 100;
     if (argc >= 2) {
-        n = atoi(argv[1]);
+        char *input;
+        errno = 0;
+        long val = strtol(argv[1], &input, 10);
+        if (errno == ERANGE || val > INT_MAX || val < INT_MIN) {
+            printf("Error: Number out of int range\n");
+            MPI_Finalize();
+            return 1;
+        }
+        n = (int)val;
     }
     if(!id) {
         printf("calculating number of primes from %d to %d ...\n", 0, n);
@@ -56,6 +61,7 @@ int main(int argc, char **argv) {
     for (int i = 2; i <= limit_sqrt; i++) {
         if (!local_mark[i]) {
             if(index % p == id) {
+                // int first = (limit_sqrt % i == 0) ? limit_sqrt : limit_sqrt + (i - limit_sqrt % i);
                 int first = limit_sqrt + i - limit_sqrt % i;
                 for (int j = first; j < n; j += i) {
                     local_mark[j] = true;
