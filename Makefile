@@ -5,6 +5,7 @@ default: mpicc
 mpicc:
 	mpicc -std=c99 ?.c -o ?
 	mpicc ./3/3-9.c -o 3-9 -I/usr/local/include -L/usr/local/lib
+	/opt/mpich2/gnu/bin/mpicc -std=c99 -o 2_comm ./2_comm.c -lm
 
 run:
 	mpiexec -n 6 ./2_comm
