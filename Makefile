@@ -13,6 +13,9 @@ a2_wesley:
 	/opt/mpich2/gnu/bin/mpicc -std=c99 -o ./2/2_comm_exe ./2/2_comm.c -lm
 	/opt/mpich2/gnu/bin/mpicc -std=c99 -o ./2/2_overlapping_exe ./2/2_overlapping.c -lm
 
+a3_wesley:
+	/opt/mpich2/gnu/bin/mpicc -std=c99 -o ./3/sieve_reduce ./3/sieve_reduce.c -lm
+
 clean:
 	rm -rf *.dSYM
 	rm -f ./*/*_exe
