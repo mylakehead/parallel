@@ -16,6 +16,13 @@ a2_wesley:
 a3_wesley:
 	/opt/mpich2/gnu/bin/mpicc -std=c99 -o ./3/sieve_reduce_exe ./3/sieve_reduce.c -lm
 
+a4_wesley:
+	/opt/mpich2/gnu/bin/mpicc -std=c99 -o ./3/latency_exe ./3/latency.c -lm
+
+run:
+	qsub -l nodes=2:ppn=1 ./sieve_reduce.sh
+
+
 clean:
 	rm -rf *.dSYM
 	rm -f ./*/*_exe
